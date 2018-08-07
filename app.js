@@ -1,6 +1,7 @@
 const http = require('http')
 const fs = require('fs')
 const path = require('path')
+const mime = require('mime')
 
 let rootDir = path.join(__dirname + '/www') 
 let server = http.createServer((request,response) => {
@@ -11,17 +12,9 @@ let server = http.createServer((request,response) => {
       if(err){
         console.log(err)
       }else{
-        if(!stats.isDirectory()){
+        if(!stats.isDirectory(targatPath)){
           // 表示是文件
-          if(path.extname(targatPath) === '.html'){
-            response.setHeader('content-type','text/html;charset=utf-8;')
-          }
-          if(path.extname(targatPath) === '.css'){
-            response.setHeader('content-type','text/css;charset=utf-8;')
-          }
-          if(path.extname(targatPath) === '.png'){
-            response.setHeader('content-type','image/png;charset=utf-8;')
-          }
+          response.setHeader('content-type',mime.getType(targatPath) + ';charset=utf-8;')
           fs.readFile(targatPath,function(err,data){
             if(err){
               console.log(err)
@@ -29,9 +22,41 @@ let server = http.createServer((request,response) => {
               response.end(data)
             }
           })
-        }else{
+        }
+
+        if(stats.isDirectory(targatPath)){
           // 表示是路径
-          response.end('这是一个路径')
+          fs.readdir(targatPath, (err,flies) => {
+            let res = flies.find((item) => {
+              return item === 'index.html'
+            })
+            if(res){
+              fs.readFile(path.join(targatPath, 'index.html'),(err, data) => {
+                response.end(data)
+              })
+            }
+            if(!res){
+              let tem = ''
+              for(let i = 0; i < flies.length;i++){
+                tem = `<li><a href="${request.url}${request.url == '/' ? '' : '/'}${flies[i]}"> ${flies[i]}</a></li>`
+              }
+              response.end(` 
+              <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+              <html>
+              <head>
+                <title>Index of /</title>
+              </head>
+              <body>
+                <h1>Index of /</h1>
+              <ul>
+                ${tem}
+              </ul>
+              </body>
+              </html>
+              `)
+            }
+
+          })
         }
       }
     })
