@@ -44,6 +44,7 @@ let server = http.createServer((request,response) => {
               <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
               <html>
               <head>
+              <meta charset="utf-8">
                 <title>Index of /</title>
               </head>
               <body>
@@ -69,6 +70,7 @@ let server = http.createServer((request,response) => {
       <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
       <html><head>
       <title>404 Not Found</title>
+      <meat clarset="utf-8"></meat>
       </head><body>
       <h1>Not Found</h1>
       <p>The requested URL ${request.url} was not found on this server.</p>
